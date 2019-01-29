@@ -21,7 +21,13 @@ def ReadDataFromFile(filename):
         FileData.sort(key=itemgetter(1))
         return FileData
 
-
+def plotDistribute(ClassiferOutput):
+    truths = []
+    lambdaVs = []
+    for truth, lambdaV in ClassiferOutput:
+        truths.append(float(truth))
+        lambdaVs.append(float(lambdaV))
+    plt.scatter(lambdaVs,truths)
 def case1(thresholds, ClassiferOutput):
     for truth, lambdaV in ClassiferOutput:
         thresholds.append(float(lambdaV))
@@ -153,16 +159,17 @@ def PlotRoc(ROCs):
     :param roc: ROC points
     '''
     color = ['r', 'g', 'b', 'y', 'purple']
-    label = ['label1', 'label2', 'label3', 'label4', 'label5',]
+    label = ['app1', 'app2', 'app3', 'app4', 'app5',]
     plt.figure(figsize=(12, 7))
     plt.axis([0, 1, 0, 1])
     plt.title('ROC')
 
-    plt.subplot(2, 3, 1)
+    #plt.subplot(2, 3, 1)
     plt.plot([0, 1], [0, 1], '-.', linewidth=0.5, color='black')
     for i in range(0, 5):
-        plt.plot(ROCs[i][1], ROCs[i][0], color=color[i], label=label[i])
+        plt.plot(ROCs[i][1], ROCs[i][0], color=color[i], label=label[i], linewidth=5/(i+1))
     plt.legend(loc='lower right')
+    '''
     for i in range(0, 5):
         plt.subplot(2, 3, i+2)
         plt.plot([0, 1], [0, 1], '-.', linewidth=0.5, color='black')
@@ -170,8 +177,12 @@ def PlotRoc(ROCs):
         plt.text(0.8, 0.2, 'auc:{:0.2f}'.format(ROCs[i][2]))
         plt.legend(loc='lower right')
         if i == 2:
+            
             plt.ylabel('Probability of Detection\n(P$_D$)')
             plt.xlabel('Probability of False Alarm\n(P$_F$$_A$)')
+            '''
+    plt.ylabel('Probability of Detection\n(P$_D$)')
+    plt.xlabel('Probability of False Alarm\n(P$_F$$_A$)')
     plt.show()
 
 
@@ -185,7 +196,7 @@ def PlotSingleRoc(roc, maxPcd1, maxPcd2, maxPcd3):
     :return:
     '''
     color = ['r', 'g', 'b', 'y', 'purple']
-    label = ['label1', 'label2', 'label3', 'label4', 'label5', ]
+    label = ['app1', 'app2', 'app3', 'app4', 'app5', ]
     plt.figure(figsize=(12, 7))
     plt.axis([-0.005, 1.005, -0.005, 1.005])
     plt.title('ROC')
@@ -198,6 +209,7 @@ def PlotSingleRoc(roc, maxPcd1, maxPcd2, maxPcd3):
     plt.scatter(x=maxPcd3[2], y=maxPcd3[1], color='yellow', label='p(H0)=2p(H1)')
     plt.annotate('{:.2f}'.format(maxPcd3[0]), (maxPcd3[2]+0.02, maxPcd3[1]-0.02))
     plt.plot(roc[1], roc[0], color=color[2], label='roc')
+    plt.text(0.9, 0.2, 'auc:{:0.2f}'.format(roc[2]))
     plt.legend(loc='lower right')
     plt.ylabel('Probability of Detection\n(P$_D$)')
     plt.xlabel('Probability of False Alarm\n(P$_F$$_A$)')
@@ -224,6 +236,7 @@ def ThresholdComparison(filename):
     :return:
     '''
     ClassiferOutput = ReadDataFromFile(filename)
+    plotDistribute(ClassiferOutput)
     thresholds = GenerateThreshold(ClassiferOutput, 'decision 1')
     roc1 = GenerateRoc(ClassiferOutput, thresholds)
     print(CalculateOverlapPoint(roc1))
