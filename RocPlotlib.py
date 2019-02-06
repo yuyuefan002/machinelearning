@@ -162,7 +162,7 @@ def PlotRoc(ROCs):
     color = ['r', 'g', 'b', 'y', 'purple']
     label = ['app1', 'app2', 'app3', 'app4', 'app5',]
     plt.figure(figsize=(12, 7))
-    plt.axis([0, 1, 0, 1])
+    plt.axis([-0.01, 1.01, -0.01, 1.01])
     plt.title('ROC')
     plt.plot([0, 1], [0, 1], '-.', linewidth=0.5, color='black')
     for i in range(len(ROCs)):
@@ -263,22 +263,27 @@ def ThresholdComparison(filename):
     PlotRoc(ROCs)
 
 
-def plot(ROCs):
+def plot(ROCs, maxPcds=None):
     '''
     plot ROC for question 9
     :param roc: ROC points
     '''
-    color = ['r', 'g', 'b', 'y', 'purple']
-    label = ['app1', 'app2', 'app3', 'app4', 'app5', ]
+
+    color = ['purple', 'g', 'b', 'y', 'red']
+    label = ['k=1', 'k=5', 'k=31', 'k=91', 'app5', ]
     plt.figure(figsize=(12, 7))
-    plt.axis([0, 1, 0, 1])
+    plt.axis([-0.01, 1.01, -0.01, 1.01])
     plt.title('ROC')
     plt.plot([0, 1], [0, 1], '-.', linewidth=0.5, color='black')
     for i in range(len(ROCs)):
-        plt.plot(ROCs[i][1], ROCs[i][0], color=color[i], label=label[i], linewidth=3*len(ROCs) / (i + 1))
+        plt.plot(ROCs[i][1], ROCs[i][0], color=color[i], label=label[i]+" auc={:.3f}".format(ROCs[i][2]), linewidth=len(ROCs) / (i + 1))
     plt.legend(loc='lower right')
     plt.ylabel('Probability of Detection\n(P$_D$)')
     plt.xlabel('Probability of False Alarm\n(P$_F$$_A$)')
+    if maxPcds is not None:
+        for maxPcd in maxPcds:
+            plt.scatter(x=maxPcd[2], y=maxPcd[1], color='red', label=f'{maxPcd[0]}')
+            plt.annotate('{:.3f}'.format(maxPcd[0]), (maxPcd[2] +0.01, maxPcd[1] -0.01))
     plt.show()
 
 def PlotROC(filename, thresholdStrategy):
@@ -322,6 +327,21 @@ def CalculateMaxPcd(roc_data, ph0, ph1):
             max_pd = float(pd)
     return [max, max_pd, max_pfa]
 
+def CalMaxPcd(roc, ph0, ph1):
+    max= 0
+    max_pfa = 0
+    max_pd = 0
+    pfa = roc[1]
+    pd = roc[0]
+
+    for i in range(len(pfa)):
+        tmp = pd[i]*ph1 + (1-pfa[i]) * ph0
+        if tmp > max:
+            max = tmp
+            max_pfa = pfa[i]
+            max_pd = pd[i]
+    return [max, max_pd, max_pfa]
+
 
 def auc_pcd_test(filename):
     '''
@@ -338,5 +358,5 @@ def auc_pcd_test(filename):
 
 
 if __name__ == '__main__':
-    ThresholdComparison('moderateData.csv')
-    #auc_pcd_test('rocData.csv')
+    #ThresholdComparison('moderateData.csv')
+    auc_pcd_test('rocData.csv')
