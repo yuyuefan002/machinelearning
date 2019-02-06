@@ -17,7 +17,8 @@ def ReadDataFromFile(filename):
         SpamReader = csv.reader(csvfile, delimiter=' ', quotechar='|')
 
         for row in SpamReader:
-            FileData.append(row[0].split(','))
+            truth, lambdaV = row[0].split(',')
+            FileData.append([float(truth), float(lambdaV)])
         FileData.sort(key=itemgetter(1))
         return FileData
 
@@ -27,7 +28,7 @@ def plotDistribute(ClassiferOutput):
     for truth, lambdaV in ClassiferOutput:
         truths.append(float(truth))
         lambdaVs.append(float(lambdaV))
-    plt.scatter(lambdaVs,truths)
+    plt.scatter(lambdaVs, truths)
 def case1(thresholds, ClassiferOutput):
     for truth, lambdaV in ClassiferOutput:
         thresholds.append(float(lambdaV))
@@ -74,7 +75,7 @@ def case4(thresholds, ClassiferOutput):
 def case5(thresholds, ClassiferOutput):
     h0 = []
     for truth, lambdaV in ClassiferOutput:
-        if truth == '0':
+        if truth == 0:
             h0.append(float(lambdaV))
     i = 0
     n = len(h0)
@@ -163,13 +164,19 @@ def PlotRoc(ROCs):
     plt.figure(figsize=(12, 7))
     plt.axis([0, 1, 0, 1])
     plt.title('ROC')
-
-    #plt.subplot(2, 3, 1)
     plt.plot([0, 1], [0, 1], '-.', linewidth=0.5, color='black')
-    for i in range(0, 5):
+    for i in range(len(ROCs)):
+        plt.plot(ROCs[i][1], ROCs[i][0], color=color[i], label=label[i], linewidth=len(ROCs)/(i+1))
+    plt.legend(loc='lower right')
+    plt.ylabel('Probability of Detection\n(P$_D$)')
+    plt.xlabel('Probability of False Alarm\n(P$_F$$_A$)')
+    plt.show()
+    plt.subplot(2, 3, 1)
+    plt.plot([0, 1], [0, 1], '-.', linewidth=0.5, color='black')
+    for i in range(0, len(ROCs)):
         plt.plot(ROCs[i][1], ROCs[i][0], color=color[i], label=label[i], linewidth=5/(i+1))
     plt.legend(loc='lower right')
-    '''
+
     for i in range(0, 5):
         plt.subplot(2, 3, i+2)
         plt.plot([0, 1], [0, 1], '-.', linewidth=0.5, color='black')
@@ -180,9 +187,9 @@ def PlotRoc(ROCs):
             
             plt.ylabel('Probability of Detection\n(P$_D$)')
             plt.xlabel('Probability of False Alarm\n(P$_F$$_A$)')
-            '''
-    plt.ylabel('Probability of Detection\n(P$_D$)')
-    plt.xlabel('Probability of False Alarm\n(P$_F$$_A$)')
+
+    # plt.ylabel('Probability of Detection\n(P$_D$)')
+    # plt.xlabel('Probability of False Alarm\n(P$_F$$_A$)')
     plt.show()
 
 
@@ -207,7 +214,7 @@ def PlotSingleRoc(roc, maxPcd1, maxPcd2, maxPcd3):
     plt.scatter(x=maxPcd2[2], y=maxPcd2[1], color='purple', label='2p(H0)=p(H1)')
     plt.annotate(f'{maxPcd2[0]}', (maxPcd2[2]+0.02, maxPcd2[1]+0.02))
     plt.scatter(x=maxPcd3[2], y=maxPcd3[1], color='yellow', label='p(H0)=2p(H1)')
-    plt.annotate('{:.2f}'.format(maxPcd3[0]), (maxPcd3[2]+0.02, maxPcd3[1]-0.02))
+    plt.annotate('{:.4f}'.format(maxPcd3[0]), (maxPcd3[2]+0.02, maxPcd3[1]-0.02))
     plt.plot(roc[1], roc[0], color=color[2], label='roc')
     plt.text(0.9, 0.2, 'auc:{:0.2f}'.format(roc[2]))
     plt.legend(loc='lower right')
@@ -256,6 +263,31 @@ def ThresholdComparison(filename):
     PlotRoc(ROCs)
 
 
+def plot(ROCs):
+    '''
+    plot ROC for question 9
+    :param roc: ROC points
+    '''
+    color = ['r', 'g', 'b', 'y', 'purple']
+    label = ['app1', 'app2', 'app3', 'app4', 'app5', ]
+    plt.figure(figsize=(12, 7))
+    plt.axis([0, 1, 0, 1])
+    plt.title('ROC')
+    plt.plot([0, 1], [0, 1], '-.', linewidth=0.5, color='black')
+    for i in range(len(ROCs)):
+        plt.plot(ROCs[i][1], ROCs[i][0], color=color[i], label=label[i], linewidth=3*len(ROCs) / (i + 1))
+    plt.legend(loc='lower right')
+    plt.ylabel('Probability of Detection\n(P$_D$)')
+    plt.xlabel('Probability of False Alarm\n(P$_F$$_A$)')
+    plt.show()
+
+def PlotROC(filename, thresholdStrategy):
+    ClassiferOutput = ReadDataFromFile(filename)
+    thresholds = GenerateThreshold(ClassiferOutput, thresholdStrategy)
+    roc = GenerateRoc(ClassiferOutput, thresholds)
+    print(CalculateOverlapPoint(roc))
+    ROCs = [roc]
+    plot(ROCs)
 def FormatTransform(data):
     '''
     Transform the format of csv data
@@ -271,7 +303,7 @@ def FormatTransform(data):
     return [pds, pfas, auc]
 
 
-def CalculateMaxPcd(roc_raw, ph0, ph1):
+def CalculateMaxPcd(roc_data, ph0, ph1):
     '''
     This function calculate the max pcd based on different conditions
     :param roc_raw:
@@ -282,7 +314,7 @@ def CalculateMaxPcd(roc_raw, ph0, ph1):
     max = 0
     max_pfa = 0
     max_pd = 0
-    for pfa, pd in roc_raw:
+    for pfa, pd in roc_data:
         tmp = float(pd) * ph1 + (1 - float(pfa)) * ph0
         if tmp > max:
             max = tmp
@@ -306,5 +338,5 @@ def auc_pcd_test(filename):
 
 
 if __name__ == '__main__':
-    ThresholdComparison('logNormalData.csv')
+    ThresholdComparison('moderateData.csv')
     #auc_pcd_test('rocData.csv')
