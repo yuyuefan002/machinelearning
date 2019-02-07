@@ -263,14 +263,14 @@ def ThresholdComparison(filename):
     PlotRoc(ROCs)
 
 
-def plot(ROCs, maxPcds=None):
+def plot(ROCs, label, maxPcds=None, points=None, mean_point=None):
     '''
     plot ROC for question 9
     :param roc: ROC points
     '''
 
     color = ['purple', 'g', 'b', 'y', 'red']
-    label = ['k=1', 'k=5', 'k=31', 'k=91', 'app5', ]
+    label = label
     plt.figure(figsize=(12, 7))
     plt.axis([-0.01, 1.01, -0.01, 1.01])
     plt.title('ROC')
@@ -284,6 +284,11 @@ def plot(ROCs, maxPcds=None):
         for maxPcd in maxPcds:
             plt.scatter(x=maxPcd[2], y=maxPcd[1], color='red', label=f'{maxPcd[0]}')
             plt.annotate('{:.3f}'.format(maxPcd[0]), (maxPcd[2] +0.01, maxPcd[1] -0.01))
+    if points is not None:
+        for point in points:
+            plt.scatter(x=point[1], y=point[0], color='red')
+    if mean_point is not None:
+        plt.scatter(x=point[1], y=point[0], color='yellow')
     plt.show()
 
 def PlotROC(filename, thresholdStrategy):

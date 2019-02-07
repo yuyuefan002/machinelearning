@@ -187,54 +187,168 @@ def kNNRoc(TrainData, TestData, k):
     thresholds = RocPlotlib.GenerateThreshold(pdfs, 'decision 3')
     roc = RocPlotlib.GenerateRoc(pdfs, thresholds)
     return roc
+class Solution:
+    def question3a(self):
+        kNNVisualization('dataSetHorseshoes.csv', 1)
+        kNNVisualization('dataSetHorseshoes.csv', 5)
+        kNNVisualization('dataSetHorseshoes.csv', 31)
+        kNNVisualization('dataSetHorseshoes.csv', 91)
 
-def question3a():
-    kNNVisualization('dataSetHorseshoes.csv', 1)
-    kNNVisualization('dataSetHorseshoes.csv', 5)
-    kNNVisualization('dataSetHorseshoes.csv', 31)
-    kNNVisualization('dataSetHorseshoes.csv', 91)
+    def question3c(self):
+        FileData = ReadDataFromFile('dataSetHorseshoes.csv')
+        kNNVisualization('dataSetHorseshoes.csv', int(len(FileData) / 2 - 1))
+        kNNVisualization('dataSetHorseshoes.csv', int(len(FileData) - 1))
 
-def question3c():
-    FileData = ReadDataFromFile('dataSetHorseshoes.csv')
-    kNNVisualization('dataSetHorseshoes.csv', int(len(FileData) / 2 - 1))
-    kNNVisualization('dataSetHorseshoes.csv', int(len(FileData) - 1))
+    def question4a(self):
+        import RocPlotlib
+        TrainData = ReadDataFromFile('dataSetHorseshoes.csv')
+        TestData = TrainData
+        roc1 = kNNRoc(TrainData, TestData, 1)
+        maxPcd1 = RocPlotlib.CalMaxPcd(roc1, 0.5, 0.5)
+        roc2 = kNNRoc(TrainData, TestData, 5)
+        maxPcd2 = RocPlotlib.CalMaxPcd(roc2, 0.5, 0.5)
+        roc3 = kNNRoc(TrainData, TestData, 31)
+        maxPcd3 = RocPlotlib.CalMaxPcd(roc3, 0.5, 0.5)
+        roc4 = kNNRoc(TrainData, TestData, 91)
+        maxPcd4 = RocPlotlib.CalMaxPcd(roc4, 0.5, 0.5)
+        ROCs = [roc1, roc2, roc3, roc4]
+        label = ['k=1', 'k=5', 'k=31', 'k=91', 'app5', ]
+        RocPlotlib.plot(ROCs, label, maxPcds=[maxPcd1, maxPcd2, maxPcd3, maxPcd4, ])
 
-def question4a():
-    import RocPlotlib
-    TrainData = ReadDataFromFile('dataSetHorseshoes.csv')
-    TestData = TrainData
-    roc1 = kNNRoc(TrainData, TestData, 1)
-    maxPcd1 = RocPlotlib.CalMaxPcd(roc1, 0.5, 0.5)
-    roc2 = kNNRoc(TrainData, TestData, 5)
-    maxPcd2 = RocPlotlib.CalMaxPcd(roc2, 0.5, 0.5)
-    roc3 = kNNRoc(TrainData, TestData, 31)
-    maxPcd3 = RocPlotlib.CalMaxPcd(roc3, 0.5, 0.5)
-    roc4 = kNNRoc(TrainData, TestData, 91)
-    maxPcd4 = RocPlotlib.CalMaxPcd(roc4, 0.5, 0.5)
-    ROCs = [roc1, roc2, roc3, roc4]
-    RocPlotlib.plot(ROCs, maxPcds=[maxPcd1, maxPcd2, maxPcd3, maxPcd4, ])
+    def question4c(self):
+        import RocPlotlib
+        TrainData = ReadDataFromFile('dataSetHorseshoes.csv')
+        TestData = ReadDataFromFile('dataSetHorseshoesTest.csv')
+        roc1 = kNNRoc(TrainData, TestData, 1)
+        maxPcd1 = RocPlotlib.CalMaxPcd(roc1, 0.5, 0.5)
+        roc2 = kNNRoc(TrainData, TestData, 5)
+        maxPcd2 = RocPlotlib.CalMaxPcd(roc2, 0.5, 0.5)
+        roc3 = kNNRoc(TrainData, TestData, 31)
+        maxPcd3 = RocPlotlib.CalMaxPcd(roc3, 0.5, 0.5)
+        roc4 = kNNRoc(TrainData, TestData, 91)
+        maxPcd4 = RocPlotlib.CalMaxPcd(roc4, 0.5, 0.5)
+        ROCs = [roc1, roc2, roc3, roc4]
+        label = ['k=1', 'k=5', 'k=31', 'k=91', 'app5', ]
+        RocPlotlib.plot(ROCs, label, maxPcds=[maxPcd1, maxPcd2, maxPcd3, maxPcd4, ])
 
-def question4c():
-    import RocPlotlib
-    TrainData = ReadDataFromFile('dataSetHorseshoes.csv')
-    TestData = ReadDataFromFile('dataSetHorseshoesTest.csv')
-    roc1 = kNNRoc(TrainData, TestData, 1)
-    maxPcd1 = RocPlotlib.CalMaxPcd(roc1, 0.5, 0.5)
-    roc2 = kNNRoc(TrainData, TestData, 5)
-    maxPcd2 = RocPlotlib.CalMaxPcd(roc2, 0.5, 0.5)
-    roc3 = kNNRoc(TrainData, TestData, 31)
-    maxPcd3 = RocPlotlib.CalMaxPcd(roc3, 0.5, 0.5)
-    roc4 = kNNRoc(TrainData, TestData, 91)
-    maxPcd4 = RocPlotlib.CalMaxPcd(roc4, 0.5, 0.5)
-    ROCs = [roc1, roc2, roc3, roc4]
-    RocPlotlib.plot(ROCs, maxPcds=[maxPcd1, maxPcd2, maxPcd3, maxPcd4, ])
+    def question4e(self):
+        def plot(data):
+            x, minPes = data[0]
+            print(data)
+            plt.axis([0.0, 400.0, 0.0, 1.0])
+            plt.plot(x, minPes, color='red')
+            x, minPes = data[1]
+            plt.plot(x, minPes, color='blue')
+            plt.show()
 
-if __name__ == "__main__":
+        import RocPlotlib
+        data = []
+        TrainData = ReadDataFromFile('dataSetHorseshoes.csv')
+
+        TestData = TrainData
+        minPes = []
+        x = []
+        for k in range(1, 400):
+            roc = kNNRoc(TrainData, TestData, k)
+            maxPcd = RocPlotlib.CalMaxPcd(roc, 0.5, 0.5)
+            minPes.append(1 - maxPcd[0])
+            x.append(400/k)
+
+        data.append([x, minPes])
+
+        # save = []
+        # for k in range(len(x)):
+        #     save.append([x[k], minPes[k]])
+        # with open('pe1.csv', 'w') as writefile:
+        #     writer = csv.writer(writefile)
+        #     writer.writerows(save)
+        TestData = ReadDataFromFile('dataSetHorseshoesTest.csv')
+        minPes = []
+        x = []
+        for k in range(1, 400):
+            roc = kNNRoc(TrainData, TestData, k)
+            maxPcd = RocPlotlib.CalMaxPcd(roc, 0.5, 0.5)
+            minPes.append(1 - maxPcd[0])
+            x.append(400/k)
+        # save = []
+        # for k in range(len(x)):
+        #     save.append([x[k], minPes[k]])
+        # with open('pe2.csv', 'w') as writefile:
+        #     writer = csv.writer(writefile)
+        #     writer.writerows(save)
+        data.append([x, minPes])
+        plot(data)
+
+    def question5a(self):
+        def seperate(ClassiferOutput):
+            h0 = []
+            h1 = []
+            for data in ClassiferOutput:
+                if data[0] == 0:
+                    h0.append(data[1])
+                else:
+                    h1.append(data[1])
+            return h0, h1
+        import RocPlotlib
+        import seaborn as sns
+        sns.set()
+        ClassiferOutput = RocPlotlib.ReadDataFromFile('knn3DecisionStatistics.csv')
+        h0, h1 = seperate(ClassiferOutput)
+        sns.kdeplot(h0)
+        thresholds = [0, 0.33333, 0.66667, 1, math.inf]
+        roc = RocPlotlib.GenerateRoc(ClassiferOutput, thresholds)
+        ROCs = [roc]
+        RocPlotlib.plot(ROCs, ['roc'])
+
+    def question5(self):
+        def randomGeneratePd95():
+            pdcount = 0
+            for i in range(20):
+                if random.uniform(0, 1) >= 0.25:
+                    pdcount += 1
+            pfacount = 0
+            for i in range(70):
+                if random.uniform(0, 1) >= 0.25:
+                    pfacount += 1
+            pdpb = pdcount / 20
+            pfapb = pfacount / 70
+            pdpb = 0.8 + 0.2 * pdpb
+            pfapb = 0.3 + 0.7 * pfapb
+            return pdpb, pfapb
+        def mean(points):
+            n = len(points)
+            mean_pfa = 0
+            mean_pd = 0
+            for point in points:
+                mean_pd += point[0]
+                mean_pfa += point[1]
+            mean_pd = mean_pd / n
+            mean_pfa = mean_pfa / n
+            return [mean_pd, mean_pfa]
+        import RocPlotlib
+        import random
+        ClassiferOutput = RocPlotlib.ReadDataFromFile('knn3DecisionStatistics.csv')
+        thresholds = [0, 0.33333, 0.66667, 1, math.inf]
+        roc = RocPlotlib.GenerateRoc(ClassiferOutput, thresholds)
+        ROCs = [roc]
+        points = []
+        for i in range(1000):
+            pdpb, pfapb = randomGeneratePd95()
+            points.append([pdpb, pfapb])
+        mean_point = mean(points)
+        print(mean_point)
+        RocPlotlib.plot(ROCs, ['roc'], points=points,mean_point=mean_point)
+
+
+if __name__ == '__main__':
+    Solution = Solution()
     # question 3a
-    #question3a()
+    #Solution.question3a()
     # question 3c
-    #question3c()
-    #question 4a
-    #question4a()
-    #question 4c
-    #question4c()
+    #Solution.question3c()
+    # question 4a
+    #Solution.question4a()
+    # question 4c
+    #Solution.question4c()
+    #Solution.question4e()
+    Solution.question5()
