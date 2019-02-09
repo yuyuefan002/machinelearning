@@ -300,7 +300,44 @@ class Solution:
         ROCs = [roc]
         RocPlotlib.plot(ROCs, ['roc'])
 
-    def question5(self):
+
+    def question5b(self):
+        def seperate(Data):
+            h1s = []
+            h1b = []
+            for d in Data:
+                if d[0] == 1 and d[1] < 0.33333:
+                    h1s.append(d[1])
+                elif d[0] == 1 and d[1] >= 0.33333:
+                    h1b.append(d[1])
+            return h1s, h1b
+        def Geth1(Data):
+            import random
+            h1 = []
+            for d in Data:
+                if random.randint(0, 99) < 75:
+                    h1.append(d)
+            h1.sort()
+            return h1, len(h1)/100
+        import RocPlotlib
+        import numpy as np
+        import seaborn
+        seaborn.set()
+        ClassiferOutput = RocPlotlib.ReadDataFromFile('knn3DecisionStatistics.csv')
+        h1s, h1b = seperate(ClassiferOutput)
+        seaborn.kdeplot(h1s + h1b)
+        probs = []
+        times = 100
+        for i in range(times):
+            h1, prob = Geth1(h1s)
+            probs.append(prob+0.8)
+            #seaborn.kdeplot(h1+h1b)
+            #plt.vlines(, 0, 10)
+
+        plt.text(0.3, 1, f'after running {times} times, Pd is {np.mean(probs):.4f} in average')
+        plt.show()
+
+    def question5c(self):
         def randomGeneratePd95():
             pdcount = 0
             for i in range(20):
@@ -351,4 +388,5 @@ if __name__ == '__main__':
     # question 4c
     #Solution.question4c()
     #Solution.question4e()
-    Solution.question5()
+    Solution.question5b()
+    #Solution.question5c()
