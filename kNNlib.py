@@ -184,7 +184,11 @@ def kNNRoc(TrainData, TestData, k):
     pdfs = []
     for i in range(len(lambdaVs)):
         pdfs.append([float(TestData[i][2]), lambdaVs[i]])
-    thresholds = RocPlotlib.GenerateThreshold(pdfs, 'decision 3')
+    #thresholds = RocPlotlib.GenerateThreshold(pdfs, 'decision 3')
+    thresholds=[]
+    for i in range(0, k+1):
+        thresholds.append(i/k)
+    thresholds.append(math.inf)
     roc = RocPlotlib.GenerateRoc(pdfs, thresholds)
     return roc
 class Solution:
@@ -256,12 +260,6 @@ class Solution:
 
         data.append([x, minPes])
 
-        # save = []
-        # for k in range(len(x)):
-        #     save.append([x[k], minPes[k]])
-        # with open('pe1.csv', 'w') as writefile:
-        #     writer = csv.writer(writefile)
-        #     writer.writerows(save)
         TestData = ReadDataFromFile('dataSetHorseshoesTest.csv')
         minPes = []
         x = []
@@ -270,12 +268,6 @@ class Solution:
             maxPcd = RocPlotlib.CalMaxPcd(roc, 0.5, 0.5)
             minPes.append(1 - maxPcd[0])
             x.append(400/k)
-        # save = []
-        # for k in range(len(x)):
-        #     save.append([x[k], minPes[k]])
-        # with open('pe2.csv', 'w') as writefile:
-        #     writer = csv.writer(writefile)
-        #     writer.writerows(save)
         data.append([x, minPes])
         plot(data)
 
@@ -325,15 +317,16 @@ class Solution:
         seaborn.set()
         ClassiferOutput = RocPlotlib.ReadDataFromFile('knn3DecisionStatistics.csv')
         h1s, h1b = seperate(ClassiferOutput)
-        seaborn.kdeplot(h1s + h1b)
+        # seaborn.kdeplot(h1s + h1b)
         probs = []
         times = 100
         for i in range(times):
             h1, prob = Geth1(h1s)
             probs.append(prob+0.8)
             #seaborn.kdeplot(h1+h1b)
-            #plt.vlines(, 0, 10)
-
+        seaborn.kdeplot(probs)
+        plt.vlines(np.mean(probs), 0, 20, label=f"estimation of Pd, Pd is {np.mean(probs):.4f} in average")
+        plt.legend(loc='best')
         plt.text(0.3, 1, f'after running {times} times, Pd is {np.mean(probs):.4f} in average')
         plt.show()
 
@@ -387,6 +380,6 @@ if __name__ == '__main__':
     #Solution.question4a()
     # question 4c
     #Solution.question4c()
-    #Solution.question4e()
-    Solution.question5b()
+    Solution.question4e()
+    #Solution.question5b()
     #Solution.question5c()
